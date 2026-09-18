@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bajnokok - Venor2 Kisállatok</title>
+  <link rel="icon" href="logo.png" type="image/jpeg">
+  <style>
+    :root {
+      --bg-color: #0b0914;
+      --card-bg: rgba(22, 18, 36, 0.85);
+      --card-border: rgba(168, 85, 247, 0.25);
+      --accent-purple: #a855f7;
+      --accent-glow: #c084fc;
+      --accent-gold: #fbbf24;
+      --accent-cyan: #38bdf8;
+      --text: #f3f4f6;
+      --text-muted: #a1a1aa;
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
+      background-color: var(--bg-color);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 50% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 60%),
+        radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+      background-attachment: fixed;
+      color: var(--text);
+      padding: 30px 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 25px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .header-branding {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .logo-link {
+      display: inline-block;
+      text-decoration: none;
+    }
+
+    .main-logo {
+      max-width: 290px;
+      height: auto;
+      filter: drop-shadow(0 0 25px rgba(168, 85, 247, 0.6));
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+
+    .main-logo:hover {
+      transform: scale(1.03);
+    }
+
+    .clan-badge-card {
+      position: relative;
+      width: 95px;
+      height: 95px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, rgba(11, 9, 20, 0.9) 100%);
+      border: 2px solid var(--accent-cyan);
+      padding: 5px;
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.5), inset 0 0 15px rgba(168, 85, 247, 0.4);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .clan-badge-card:hover {
+      transform: scale(1.08) rotate(2deg);
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 35px rgba(251, 191, 36, 0.7), inset 0 0 20px rgba(56, 189, 248, 0.6);
+    }
+
+    .clan-logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      filter: contrast(1.1) brightness(1.05);
+    }
+
+    .disclaimer-badge {
+      margin-top: 12px;
+      font-size: 0.82em;
+      color: var(--text-muted);
+      background: rgba(10, 8, 18, 0.6);
+      border: 1px solid rgba(168, 85, 247, 0.2);
+      padding: 6px 16px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .stats-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 22px 28px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      font-size: 1.1em;
+      margin-bottom: 12px;
+    }
+
+    .progress-text-val {
+      color: var(--accent-cyan);
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+    }
+
+    .progress-bar-container {
+      background: rgba(10, 8, 18, 0.8);
+      border-radius: 12px;
+      height: 22px;
+      overflow: hidden;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      padding: 3px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #a855f7, #fbbf24);
+      border-radius: 8px;
+      width: 0%;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.8);
+    }
+
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 310px;
+      gap: 25px;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .search-box input {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 12px 18px;
+      border-radius: 10px;
+      width: 300px;
+      outline: none;
+      font-size: 0.95em;
+      transition: all 0.3s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .search-box input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .filter-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 10px 22px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.25s;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      background: var(--accent-purple);
+      color: #fff;
+      border-color: var(--accent-purple);
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+    }
+
+    .pet-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 22px;
+    }
+
+    .pet-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pet-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent-purple);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(168, 85, 247, 0.3);
+    }
+
+    .pet-card.owned {
+      border-color: var(--success);
+      background: linear-gradient(180deg, rgba(22, 18, 36, 0.9) 0%, rgba(16, 185, 129, 0.12) 100%);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), inset 0 0 15px rgba(16, 185, 129, 0.1);
+    }
+
+    .pet-icon {
+      width: 150px;
+      height: 150px;
+      background: rgba(10, 8, 18, 0.7);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      padding: 10px;
+      margin-bottom: 14px;
+      transition: all 0.3s ease;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.7);
+    }
+
+    .pet-card:hover .pet-icon {
+      border-color: var(--accent-glow);
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+    }
+
+    .pet-card.owned .pet-icon {
+      border-color: rgba(16, 185, 129, 0.5);
+      background: rgba(10, 25, 18, 0.8);
+    }
+
+    .pet-icon img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.7));
+      transition: transform 0.3s ease;
+    }
+
+    .pet-card:hover .pet-icon img {
+      transform: scale(1.1);
+    }
+
+    .pet-title {
+      font-weight: 700;
+      font-size: 1.15em;
+      margin-bottom: 12px;
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pet-mini-icon {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+      vertical-align: middle;
+    }
+
+    .bonus-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      width: 100%;
+      margin-bottom: 18px;
+      flex-grow: 1;
+      justify-content: center;
+    }
+
+    .bonus-tag {
+      background: rgba(168, 85, 247, 0.12);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      color: #e9d5ff;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.85em;
+      font-weight: 500;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      line-height: 1.3;
+    }
+
+    .bonus-val {
+      color: var(--accent-gold);
+      font-weight: 700;
+      font-size: 1.05em;
+    }
+
+    .pet-card.owned .bonus-tag {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #d1fae5;
+    }
+
+    .pet-card.owned .bonus-val {
+      color: #34d399;
+    }
+
+    .card-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .pet-toggle-btn {
+      background: rgba(168, 85, 247, 0.15);
+      border: 1px solid var(--accent-purple);
+      color: var(--accent-glow);
+      padding: 10px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      transition: all 0.25s;
+    }
+
+    .pet-toggle-btn:hover {
+      background: var(--accent-purple);
+      color: #fff;
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
+    }
+
+    .pet-card.owned .pet-toggle-btn {
+      background: var(--success);
+      color: #0b0914;
+      border-color: var(--success);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .pet-card.owned .pet-toggle-btn:hover {
+      background: #0d9668;
+      border-color: #0d9668;
+      color: #fff;
+    }
+
+    .wiki-btn {
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: var(--accent-cyan);
+      padding: 9px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: 700;
+      font-size: 0.9em;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s;
+    }
+
+    .wiki-btn:hover {
+      background: var(--accent-cyan);
+      color: #0b0914;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.6);
+    }
+
+    .sidebar-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 20px;
+      position: sticky;
+      top: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .sidebar-title {
+      font-size: 1.1em;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+      padding-bottom: 10px;
+    }
+
+    .clear-filter-btn {
+      font-size: 0.75em;
+      color: var(--accent-glow);
+      background: rgba(168, 85, 247, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .clear-filter-btn:hover {
+      background: var(--accent-purple);
+      color: #fff;
+    }
+
+    .bonus-quick-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .bonus-card-btn {
+      background: rgba(10, 8, 18, 0.6);
+      border: 1px solid rgba(168, 85, 247, 0.2);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      color: var(--text);
+      text-align: left;
+    }
+
+    .bonus-card-btn:hover {
+      border-color: var(--accent-cyan);
+      background: rgba(56, 189, 248, 0.1);
+      transform: translateX(3px);
+    }
+
+    .bonus-card-btn.active {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(56, 189, 248, 0.2));
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+    }
+
+    .bonus-card-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bonus-card-icon {
+      font-size: 1.2em;
+    }
+
+    .bonus-card-title {
+      font-size: 0.9em;
+      font-weight: 600;
+    }
+
+    .bonus-card-count {
+      background: rgba(168, 85, 247, 0.25);
+      color: var(--accent-glow);
+      font-size: 0.75em;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .bonus-card-btn.active .bonus-card-count {
+      background: var(--accent-gold);
+      color: #0b0914;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="header-branding">
+        <a href="https://venor2.hu/" target="_blank" rel="noopener noreferrer" class="logo-link" title="Ugrás a hivatalos Venor2 oldalra">
+          <img src="logo.png" alt="Venor2 Hivatalos Oldal" class="main-logo" onerror="this.onerror=null; this.src='logo.jpg.jpg';">
+        </a>
+        <div class="clan-badge-card" title="Bajnokok Klán">
+          <img src="bajnok.png" alt="Bajnokok Klán Logo" class="clan-logo-img" onerror="this.onerror=null; this.src='bajnok.jpg';">
+        </div>
+      </div>
+      <div class="disclaimer-badge">
+        ℹ️ Ez nem hivatásos oldal, csupán segítség a kisállatok nyomon követéséhez!
+      </div>
+    </header>
+
+    <div class="stats-card">
+      <div class="progress-info">
+        <span>Megszerzett petek:</span>
+        <span class="progress-text-val" id="progress-text">0 / 0 (0%)</span>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+    </div>
+
+    <div class="main-layout">
+      <div class="content-area">
+        <div class="controls">
+          <div class="search-box">
+            <input type="text" id="search-input" placeholder="Keresés név vagy bónusz alapján..." oninput="renderPets()">
+          </div>
+
+          <div class="filter-group">
+            <button class="filter-btn active" onclick="setFilter('all', this)">Összes</button>
+            <button class="filter-btn" onclick="setFilter('owned', this)">Megvan</button>
+            <button class="filter-btn" onclick="setFilter('missing', this)">Hiányzik</button>
+          </div>
+        </div>
+
+        <div class="pet-grid" id="pet-grid"></div>
+      </div>
+
+      <aside class="sidebar">
+        <div class="sidebar-card">
+          <div class="sidebar-title">
+            <span>Gyors Bónusz Szűrők</span>
+            <button class="clear-filter-btn" onclick="clearBonusFilter()">Összes</button>
+          </div>
+          <div class="bonus-quick-grid" id="bonus-quick-grid"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const LOGO_FALLBACK = "logo.jpg";
+
+    const defaultPets = [
+      { id: 1, name: "107-es céh Töpije", bonus: "+1% | Dupla tárgy dobás esélye | +5% | Szörnyek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/d92895de9370a3ce.png", miniIcon: "https://wiki.venor2.hu/assets/icons/13928981e4c7b28e.png", wikiUrl: "https://wiki.venor2.hu/items/210121", owned: false },
+      { id: 2, name: "A fekete gyöngy", bonus: "+1% | Dupla tárgy dobás esélye | +5% | Jég ereje", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/8bf67d4f4be2623f.png", miniIcon: "https://wiki.venor2.hu/assets/icons/c9f35f4e4b589acc.png", wikiUrl: "https://wiki.venor2.hu/items/210207", owned: false },
+      { id: 3, name: "Apródka", bonus: "+5% | Szörnyek elleni erő | +3% | Átlagos károk", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/770c6ae9d53400dd.png", miniIcon: "https://wiki.venor2.hu/assets/icons/217a99fe4cc092aa.png", wikiUrl: "https://wiki.venor2.hu/items/210106", owned: false },
+      { id: 4, name: "Arany Minihóhér", bonus: "+2% | Kövek elleni erő | +5% | Föld ereje", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/9dd101df0f62d599.png", miniIcon: "https://wiki.venor2.hu/assets/icons/1eab14f4bd38ef65.png", wikiUrl: "https://wiki.venor2.hu/items/53015", owned: false },
+      { id: 5, name: "Asmodeus főnixe", bonus: "+3% | Szörnyek elleni erő | +1% | Kövek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/02aef859cd93e641.png", miniIcon: "https://wiki.venor2.hu/assets/icons/1a88512821d4c8c6.png", wikiUrl: "https://wiki.venor2.hu/items/211101", owned: false },
+      { id: 6, name: "Azi", bonus: "+2% | Szörnyek elleni erő | +5% | Sötétség ereje", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/8c880eadc48fb093.png", miniIcon: "https://wiki.venor2.hu/assets/icons/33f41d2717620047.png", wikiUrl: "https://wiki.venor2.hu/items/53006", owned: false },
+      { id: 7, name: "Azika", bonus: "+1% | Szörnyek elleni erő | +3% | Sötétség ereje", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/2f1d2d761d816d36.png", miniIcon: "https://wiki.venor2.hu/assets/icons/e19ef72061effbc5.png", wikiUrl: "https://wiki.venor2.hu/items/53005", owned: false },
+      { id: 8, name: "Bagi", bonus: "+3% | Készség károk | +1% | Szörnyek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/32affad1f359032e.png", miniIcon: "https://wiki.venor2.hu/assets/icons/86a762b5f51f649d.png", wikiUrl: "https://wiki.venor2.hu/items/210186", owned: false },
+      { id: 9, name: "Bambusz", bonus: "+2% | Átlagos károk | +2% | Szörnyek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/1edc02ccaab87977.png", miniIcon: "https://wiki.venor2.hu/assets/icons/d2b29b5e6d000927.png", wikiUrl: "https://wiki.venor2.hu/items/210085", owned: false },
+      { id: 10, name: "Blaze", bonus: "+2% | Főszörnyek elleni erő | +5% | Tűz ereje", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/e01e54fc8c3e851f.png", miniIcon: "https://wiki.venor2.hu/assets/icons/dc78550a058eb6b1.png", wikiUrl: "https://wiki.venor2.hu/items/210058", owned: false },
+      { id: 11, name: "Cerberus", bonus: "+2% | Átlagos károk | +10% | Varázssebesség | +1% | Dupla tárgy dobás esélye", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/bc1c8ce4d416d48b.png", miniIcon: "https://wiki.venor2.hu/assets/icons/8618b63206177e1f.png", wikiUrl: "https://wiki.venor2.hu/items/210180", owned: false },
+      { id: 12, name: "Cerka", bonus: "+5% | Készség károk | +2% | Szörnyek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/1ddb155d2420b7f5.png", miniIcon: "https://wiki.venor2.hu/assets/icons/2ab3841ac1ff6e64.png", wikiUrl: "https://wiki.venor2.hu/items/210187", owned: false },
+      { id: 13, name: "Chiyan", bonus: "+2% | Mágikus/közelharci támadás | +2500 | Max. TP", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/4640b7e3e5898901.png", miniIcon: "https://wiki.venor2.hu/assets/icons/46cf00cd61d0f0bf.png", wikiUrl: "https://wiki.venor2.hu/items/210242", owned: false },
+      { id: 14, name: "Cotton Papagája", bonus: "+2% | Szörnyek elleni erő | +3% | Kövek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/e832374479af4e6f.png", miniIcon: "https://wiki.venor2.hu/assets/icons/0da43caecb98dab5.png", wikiUrl: "https://wiki.venor2.hu/items/210078", owned: false },
+      { id: 15, name: "Diana", bonus: "+1% | Dupla tárgy dobás esélye | +2% | Yohara kövek elleni erő | +10% | Villám ereje", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/9d0972c03103616b.png", miniIcon: "https://wiki.venor2.hu/assets/icons/1c68377824e710a6.png", wikiUrl: "https://wiki.venor2.hu/items/210148", owned: false },
+      { id: 16, name: "Don Röfington", bonus: "+5% | Kövek elleni erő | +3% | Szörnyek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/96cf8635529fff1c.png", miniIcon: "https://wiki.venor2.hu/assets/icons/ed3e11cf8aae9a1a.png", wikiUrl: "https://wiki.venor2.hu/items/210023", owned: false },
+      { id: 17, name: "Dumbyno", bonus: "+4% | Szörnyek elleni erő | +1% | Dupla tárgy dobás esélye", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/6b09cbdf8e5930aa.png", miniIcon: "https://wiki.venor2.hu/assets/icons/afecddc50c6d4f8c.png", wikiUrl: "https://wiki.venor2.hu/items/210018", owned: false },
+      { id: 18, name: "Fagyos lehelet", bonus: "+2% | Főszörnyek elleni erő | +5% | Jég ereje", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/a4bdd135f128697b.png", miniIcon: "https://wiki.venor2.hu/assets/icons/d8a07e872558b1eb.png", wikiUrl: "https://wiki.venor2.hu/items/210090", owned: false },
+      { id: 19, name: "Fények Örzője", bonus: "+2 | Sungma Erő | +1500 | Max. TP", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/9b2f50e71520c868.png", miniIcon: "https://wiki.venor2.hu/assets/icons/01006917c57e21e5.png", wikiUrl: "https://wiki.venor2.hu/items/210178", owned: false },
+      { id: 20, name: "Gobby", bonus: "+2% | Átlagos károk | +1% | Mágikus/közelharci támadás", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/5f13506625cb60e2.png", miniIcon: "https://wiki.venor2.hu/assets/icons/493b42b634610f5e.png", wikiUrl: "https://wiki.venor2.hu/items/53248", owned: false },
+      { id: 21, name: "Gömbi", bonus: "+3 | Erő | +3 | Ügyesség | +3 | Intelligencia | +3 | Életerő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/86ab02a195f4af48.png", miniIcon: "https://wiki.venor2.hu/assets/icons/7f48cc27a1a1869b.png", wikiUrl: "https://wiki.venor2.hu/items/210005", owned: false },
+      { id: 22, name: "Grim", bonus: "+1% | Szörnyek elleni erő | +3% | Sötétség ereje", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/5696ceeea1cb7859.png", miniIcon: "https://wiki.venor2.hu/assets/icons/14e8b2372aa80246.png", wikiUrl: "https://wiki.venor2.hu/items/210083", owned: false },
+      { id: 23, name: "Groot", bonus: "+2% | Dupla tárgy dobás esélye | +2 | Sungma Erő | +10% | Szél ereje", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/7f2426ef25294578.png", miniIcon: "https://wiki.venor2.hu/assets/icons/fef4478cb10239de.png", wikiUrl: "https://wiki.venor2.hu/items/210139", owned: false },
+      { id: 24, name: "Hó-Leonidász", bonus: "+5% | Kövek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/11c0426e8e0dedfc.png", miniIcon: "https://wiki.venor2.hu/assets/icons/83dd1c358b219c7e.png", wikiUrl: "https://wiki.venor2.hu/items/53018", owned: false },
+      { id: 25, name: "Holdlámpás (Kék)", bonus: "+3% | Szörnyek elleni erő | +1500 | Max. TP", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/0db324972d78e107.png", miniIcon: "https://wiki.venor2.hu/assets/icons/dfe997d3e8793028.png", wikiUrl: "https://wiki.venor2.hu/items/53240", owned: false },
+      { id: 26, name: "Holdlámpás (Narancs)", bonus: "+5% | Szörnyek elleni erő | +2000 | Max. TP", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/bb84aec9169fec44.png", miniIcon: "https://wiki.venor2.hu/assets/icons/dd4b9a4f9c1785df.png", wikiUrl: "https://wiki.venor2.hu/items/53241", owned: false },
+      { id: 27, name: "Idorion", bonus: "+3% | Szörnyek elleni erő | +1 | Sungma VIT | +5% | Átlagos kár védelem", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/9084615c3625a508.png", miniIcon: "https://wiki.venor2.hu/assets/icons/714712a9a71d1be2.png", wikiUrl: "https://wiki.venor2.hu/items/210241", owned: false },
+      { id: 28, name: "Igli", bonus: "+1 | Sungma Erő | +2% | Szörnyek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/c8578ce5cccf25ba.png", miniIcon: "https://wiki.venor2.hu/assets/icons/2711dbb2b2eb1473.png", wikiUrl: "https://wiki.venor2.hu/items/211168", owned: false },
+      { id: 29, name: "Kék Láng", bonus: "+3% | Szörnyek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/fc245021e3fe1327.png", miniIcon: "https://wiki.venor2.hu/assets/icons/f5f6b8881fb7bef5.png", wikiUrl: "https://wiki.venor2.hu/items/210164", owned: false },
+      { id: 30, name: "Kékike", bonus: "+1% | Yohara kövek elleni erő | +2% | Szörnyek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/33080a3715a0ad2e.png", miniIcon: "https://wiki.venor2.hu/assets/icons/df9f24ee7020ed43.png", wikiUrl: "https://wiki.venor2.hu/items/210193", owned: false },
+      { id: 31, name: "Király pingvin", bonus: "+3% | Szörnyek elleni erő | +10% | Esély kritikus találatra | +1% | Dupla tárgy dobás esélye", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/f4555bd43b1368ce.png", miniIcon: "https://wiki.venor2.hu/assets/icons/21a7577d74f093f6.png", wikiUrl: "https://wiki.venor2.hu/items/210226", owned: false },
+      { id: 32, name: "Kis rák", bonus: "+4% | Szörnyek elleni erő | +2% | Kövek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/aa5545aa09708dfa.png", miniIcon: "https://wiki.venor2.hu/assets/icons/2232e574b719db3b.png", wikiUrl: "https://wiki.venor2.hu/items/211169", owned: false },
+      { id: 33, name: "Leafy", bonus: "+3% | Szörnyek elleni erő | +2% | Mágikus/közelharci támadás", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/08e6876130002cfd.png", miniIcon: "https://wiki.venor2.hu/assets/icons/b5981dae78017320.png", wikiUrl: "https://wiki.venor2.hu/items/210141", owned: false },
+      { id: 34, name: "Leonidász", bonus: "+3% | Kövek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/2f387c6073fb47d4.png", miniIcon: "https://wiki.venor2.hu/assets/icons/33764226670fba5b.png", wikiUrl: "https://wiki.venor2.hu/items/53010", owned: false },
+      { id: 35, name: "Lombo", bonus: "+2% | Szörnyek elleni erő | +5% | Villám ereje", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/6f8f04487ac48050.png", miniIcon: "https://wiki.venor2.hu/assets/icons/05de9b6fb9ef6b2f.png", wikiUrl: "https://wiki.venor2.hu/items/210243", owned: false },
+      { id: 36, name: "Luka", bonus: "+5% | Szörnyek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/bb6fcebe4608033f.png", miniIcon: "https://wiki.venor2.hu/assets/icons/c9a444d7de9ecbf1.png", wikiUrl: "https://wiki.venor2.hu/items/210070", owned: false },
+      { id: 37, name: "Luna", bonus: "+3% | Szörnyek elleni erő | +3% | Főszörnyek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/6036dabf4970f20d.png", miniIcon: "https://wiki.venor2.hu/assets/icons/4cf64c7a63203cac.png", wikiUrl: "https://wiki.venor2.hu/items/210236", owned: false },
+      { id: 38, name: "Mambo", bonus: "+3% | Szörnyek elleni erő | +3% | Dupla tárgy dobás esélye", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/f4c9b096e91e0e08.png", miniIcon: "https://wiki.venor2.hu/assets/icons/217007265a7c2825.png", wikiUrl: "https://wiki.venor2.hu/items/210143", owned: false },
+      { id: 39, name: "Megváltás főnixe", bonus: "+5% | Szörnyek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/e1e326cf66cff37b.png", miniIcon: "https://wiki.venor2.hu/assets/icons/0d3d51adedb93ba6.png", wikiUrl: "https://wiki.venor2.hu/items/211102", owned: false },
+      { id: 40, name: "Mézi", bonus: "+2% | Szörnyek elleni erő | +5% | Ördögök elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/e264ab55653ada80.png", miniIcon: "https://wiki.venor2.hu/assets/icons/b01c01233d1754a8.png", wikiUrl: "https://wiki.venor2.hu/items/210116", owned: false },
+      { id: 41, name: "Moka", bonus: "+3% | Átlagos károk | +3% | Készség károk", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/3a937b15df1a878c.png", miniIcon: "https://wiki.venor2.hu/assets/icons/0662c4b603a49d1b.png", wikiUrl: "https://wiki.venor2.hu/items/210239", owned: false },
+      { id: 42, name: "Moki", bonus: "+2% | Átlagos károk | +2% | Készség károk", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/b67791c5c85065a4.png", miniIcon: "https://wiki.venor2.hu/assets/icons/3f7e3addfdb54dc6.png", wikiUrl: "https://wiki.venor2.hu/items/210238", owned: false },
+      { id: 43, name: "Mumbyno", bonus: "+5% | Szörnyek elleni erő | +1% | Dupla tárgy dobás esélye", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/72ff8ea49a51927b.png", miniIcon: "https://wiki.venor2.hu/assets/icons/45cf550249cf65f3.png", wikiUrl: "https://wiki.venor2.hu/items/210019", owned: false },
+      { id: 44, name: "OkiDoki", bonus: "+3% | Főszörnyek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/3bbf20a752a9c43d.png", miniIcon: "https://wiki.venor2.hu/assets/icons/1d0bb4433079c184.png", wikiUrl: "https://wiki.venor2.hu/items/210082", owned: false },
+      { id: 45, name: "Penészlovag", bonus: "+3% | Szörnyek elleni erő | +1% | Dupla tárgy dobás esélye", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/bc31ef98f6084468.png", miniIcon: "https://wiki.venor2.hu/assets/icons/145e839a14297363.png", wikiUrl: "https://wiki.venor2.hu/items/53250", owned: false },
+      { id: 46, name: "Pihe", bonus: "+2% | Főszörnyek elleni erő | +3% | Jég ereje", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/725f0c82a7d21253.png", miniIcon: "https://wiki.venor2.hu/assets/icons/c1237908d89c768f.png", wikiUrl: "https://wiki.venor2.hu/items/210088", owned: false },
+      { id: 47, name: "Porky", bonus: "+2% | Főszörnyek elleni erő | +3% | Tűz ereje", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/9b691a65f3b22698.png", miniIcon: "https://wiki.venor2.hu/assets/icons/5f41a99a3736578b.png", wikiUrl: "https://wiki.venor2.hu/items/53012", owned: false },
+      { id: 48, name: "Pufók Minihóhér", bonus: "+1% | Kövek elleni erő | +3% | Föld ereje", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/564c65d9676222c9.png", miniIcon: "https://wiki.venor2.hu/assets/icons/5a2cb941696971ce.png", wikiUrl: "https://wiki.venor2.hu/items/53014", owned: false },
+      { id: 49, name: "Pyroth", bonus: "+2% | Mágikus/közelharci támadás | +1500 | Max. TP", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/2dcd5bf7e5712dbb.png", miniIcon: "https://wiki.venor2.hu/assets/icons/6d05a860447458bb.png", wikiUrl: "https://wiki.venor2.hu/items/210089", owned: false },
+      { id: 50, name: "Rák Úr", bonus: "+3% | Szörnyek elleni erő | +2 | Sungma Erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/5cf160010801199f.png", miniIcon: "https://wiki.venor2.hu/assets/icons/1618e5f7ead3af78.png", wikiUrl: "https://wiki.venor2.hu/items/210383", owned: false },
+      { id: 51, name: "SkeleJerry", bonus: "+1% | Dupla tárgy dobás esélye | +5% | Yohara kövek elleni erő | +5% | Kövek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/78034a1f3eedf38d.png", miniIcon: "https://wiki.venor2.hu/assets/icons/379a5e63edb9b35c.png", wikiUrl: "https://wiki.venor2.hu/items/210175", owned: false },
+      { id: 52, name: "SkeleTom", bonus: "+3% | Yohara főszörnyek elleni erő | +3% | Főszörnyek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/e2e1c77c5cb22051.png", miniIcon: "https://wiki.venor2.hu/assets/icons/116e737f0eb9918f.png", wikiUrl: "https://wiki.venor2.hu/items/210176", owned: false },
+      { id: 53, name: "Slim", bonus: "+2% | Szörnyek elleni erő | +5% | Sötétség ereje", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/94204c6356723ad3.png", miniIcon: "https://wiki.venor2.hu/assets/icons/a74a55fc80b78c14.png", wikiUrl: "https://wiki.venor2.hu/items/210084", owned: false },
+      { id: 54, name: "Spidogi", bonus: "+1% | Szörnyek elleni erő | +3% | Szél ereje", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/94087d0ef45acd0a.png", miniIcon: "https://wiki.venor2.hu/assets/icons/c12b86e2d6aff1cb.png", wikiUrl: "https://wiki.venor2.hu/items/210112", owned: false },
+      { id: 55, name: "Szellőke", bonus: "+2% | Kövek elleni erő | +2% | Átlagos károk", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/0e3512e29c0ffc8d.png", miniIcon: "https://wiki.venor2.hu/assets/icons/84619515e6680665.png", wikiUrl: "https://wiki.venor2.hu/items/210147", owned: false },
+      { id: 56, name: "Szipi", bonus: "+4% | Szörnyek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/261b992cc993cebf.png", miniIcon: "https://wiki.venor2.hu/assets/icons/c071da9bd4cd122f.png", wikiUrl: "https://wiki.venor2.hu/items/210142", owned: false },
+      { id: 57, name: "Szöszi", bonus: "+10% | Zodiákus szörnyek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/a4d408fca2e521b2.png", miniIcon: "https://wiki.venor2.hu/assets/icons/92b89189e67928f5.png", wikiUrl: "https://wiki.venor2.hu/items/53232", owned: false },
+      { id: 58, name: "TakTik", bonus: "+1% | Yohara főszörnyek elleni erő | +1% | Yohara kövek elleni erő | +3% | Szörnyek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/c58a874b34f365a7.png", miniIcon: "https://wiki.venor2.hu/assets/icons/f36a8ab53004c29e.png", wikiUrl: "https://wiki.venor2.hu/items/210146", owned: false },
+      { id: 59, name: "TikTak", bonus: "+2 | Sungma Erő | +2 | Sungma VIT | +3% | Szörnyek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/7b2a2c1f133d97ea.png", miniIcon: "https://wiki.venor2.hu/assets/icons/ae3fe2a81b09aded.png", wikiUrl: "https://wiki.venor2.hu/items/211152", owned: false },
+      { id: 60, name: "Túrázó", bonus: "+3% | Szörnyek elleni erő | +5% | Varázssebesség", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/25c76acf10ff526b.png", miniIcon: "https://wiki.venor2.hu/assets/icons/dfa94fcdcff5b6b9.png", wikiUrl: "https://wiki.venor2.hu/items/210001", owned: false },
+      { id: 61, name: "Úszógumi", bonus: "+1 | Sungma Erő | +1 | Sungma VIT | +3% | Szörnyek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/e6c9e224c9b6a407.png", miniIcon: "https://wiki.venor2.hu/assets/icons/bf3d7021dff42d5f.png", wikiUrl: "https://wiki.venor2.hu/items/210194", owned: false },
+      { id: 62, name: "Venorax", bonus: "+2% | Átlagos károk | +5% | Tűz ereje", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/c10a646924dc7ffa.png", miniIcon: "https://wiki.venor2.hu/assets/icons/80c5f3066b8d6094.png", wikiUrl: "https://wiki.venor2.hu/items/210087", owned: false },
+      { id: 63, name: "Venori", bonus: "+5% | Szörnyek elleni erő | +3% | Átlagos károk", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/dc95f962d9ecc38f.png", miniIcon: "https://wiki.venor2.hu/assets/icons/7458a8d8b8f0bf29.png", wikiUrl: "https://wiki.venor2.hu/items/210002", owned: false },
+      { id: 64, name: "Vigyor Kandúr", bonus: "+5% | Szörnyek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/01a5c37ae923fc09.png", miniIcon: "https://wiki.venor2.hu/assets/icons/98f71d90c2f6fc65.png", wikiUrl: "https://wiki.venor2.hu/items/210132", owned: false },
+      { id: 65, name: "Villám", bonus: "+1% | Szörnyek elleni erő | +3% | Villám ereje", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/401f90e5683c9694.png", miniIcon: "https://wiki.venor2.hu/assets/icons/2de0bdd257df66a6.png", wikiUrl: "https://wiki.venor2.hu/items/210240", owned: false },
+      { id: 66, name: "Voraki", bonus: "+2% | Főszörnyek elleni erő | +2% | Kövek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/ef4c5dc14bac37cf.png", miniIcon: "https://wiki.venor2.hu/assets/icons/56a4114aa36cb9b7.png", wikiUrl: "https://wiki.venor2.hu/items/211170", owned: false },
+      { id: 67, name: "Vörös", bonus: "+5% | Zodiákus szörnyek elleni erő | +2% | Átlagos károk", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/c4a8bf7346475174.png", miniIcon: "https://wiki.venor2.hu/assets/icons/0a66d5f1cc5236f9.png", wikiUrl: "https://wiki.venor2.hu/items/53288", owned: false },
+      { id: 68, name: "Vulkira a tűzmacska", bonus: "+1% | Átlagos károk | +1000 | Max. TP | +1 | Sungma Erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/19d24ccbe79369c3.png", miniIcon: "https://wiki.venor2.hu/assets/icons/96b73a395957f1fe.png", wikiUrl: "https://wiki.venor2.hu/items/53282", owned: false },
+      { id: 69, name: "Zafira", bonus: "+5% | Kövek elleni erő", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/5b03116ec0f34422.png", miniIcon: "https://wiki.venor2.hu/assets/icons/dc04c2a39e3c4196.png", wikiUrl: "https://wiki.venor2.hu/items/210059", owned: false },
+      { id: 70, name: "Zsugabuga", bonus: "+2% | Yohara kövek elleni erő | +1 | Sungma Erő | +1 | Sungma VIT", icon: "https://wiki.venor2.hu/assets/icons/mobs/high_resolution/1fa59a7c7d9a9b57.png", miniIcon: "https://wiki.venor2.hu/assets/icons/fb394ef25c5824b2.png", wikiUrl: "https://wiki.venor2.hu/items/210199", owned: false }
+    ];
+
+    const quickBonusCategories = [
+      { id: "dupla_targy", title: "Dupla tárgy dobás", searchKey: "dupla tárgy", icon: "" },
+      { id: "szornyek", title: "Szörnyek elleni erő", searchKey: "szörnyek elleni erő", icon: "" },
+      { id: "kovek", title: "Kövek elleni erő", searchKey: "kövek elleni erő", icon: "" },
+      { id: "foszornyek", title: "Főszörnyek elleni erő", searchKey: "főszörnyek elleni erő", icon: "" },
+      { id: "sungma", title: "Sungma Bónuszok", searchKey: "sungma", icon: "" },
+      { id: "atlagos_kar", title: "Átlagos károk", searchKey: "átlagos károk", icon: "" },
+      { id: "keszseg_kar", title: "Készség károk", searchKey: "készség károk", icon: "" },
+      { id: "yohara", title: "Yohara Bónuszok", searchKey: "yohara", icon: "" },
+      { id: "elemek", title: "Elemek (Tűz/Jég/stb.)", searchKey: "ereje", icon: "" }
+    ];
+
+    let pets = [];
+    let currentFilter = 'all';
+    let selectedBonusFilter = null;
+
+    function init() {
+      const savedPets = localStorage.getItem('venor2_pets_purple_v6');
+      if (savedPets) {
+        const parsed = JSON.parse(savedPets);
+        pets = defaultPets.map(dPet => {
+          const found = parsed.find(p => p.id === dPet.id);
+          return found ? { ...dPet, owned: found.owned } : dPet;
+        });
+      } else {
+        pets = defaultPets;
+        saveToLocalStorage();
+      }
+      renderBonusQuickCards();
+      renderPets();
+    }
+
+    function saveToLocalStorage() {
+      localStorage.setItem('venor2_pets_purple_v6', JSON.stringify(pets));
+    }
+
+    function formatBonus(bonusStr) {
+      if (!bonusStr) return '<div class="bonus-tag">Nincs megadott bónusz</div>';
+      
+      const parts = bonusStr.split('|').map(s => s.trim()).filter(Boolean);
+      const items = [];
+
+      if (parts.length > 1 && parts.length % 2 === 0) {
+        for (let i = 0; i < parts.length; i += 2) {
+          items.push(`<span class="bonus-val">${parts[i]}</span> ${parts[i+1]}`);
+        }
+      } else {
+        parts.forEach(p => items.push(p));
+      }
+
+      return items.map(item => `<div class="bonus-tag">${item}</div>`).join('');
+    }
+
+    function renderBonusQuickCards() {
+      const container = document.getElementById('bonus-quick-grid');
+      container.innerHTML = '';
+
+      quickBonusCategories.forEach(cat => {
+        const count = pets.filter(p => p.bonus && p.bonus.toLowerCase().includes(cat.searchKey.toLowerCase())).length;
+
+        const btn = document.createElement('button');
+        btn.className = `bonus-card-btn ${selectedBonusFilter === cat.searchKey ? 'active' : ''}`;
+        btn.onclick = () => toggleBonusQuickFilter(cat.searchKey);
+
+        btn.innerHTML = `
+          <div class="bonus-card-info">
+            <span class="bonus-card-icon">${cat.icon}</span>
+            <span class="bonus-card-title">${cat.title}</span>
+          </div>
+          <span class="bonus-card-count">${count}</span>
+        `;
+
+        container.appendChild(btn);
+      });
+    }
+
+    function toggleBonusQuickFilter(searchKey) {
+      if (selectedBonusFilter === searchKey) {
+        selectedBonusFilter = null;
+      } else {
+        selectedBonusFilter = searchKey;
+      }
+      renderBonusQuickCards();
+      renderPets();
+    }
+
+    function clearBonusFilter() {
+      selectedBonusFilter = null;
+      document.getElementById('search-input').value = '';
+      renderBonusQuickCards();
+      renderPets();
+    }
+
+    function renderPets() {
+      const grid = document.getElementById('pet-grid');
+      const searchQuery = document.getElementById('search-input').value.toLowerCase();
+      grid.innerHTML = '';
+
+      let ownedCount = 0;
+
+      const filteredPets = pets.filter(pet => {
+        if (pet.owned) ownedCount++;
+
+        const matchesSearch = pet.name.toLowerCase().includes(searchQuery) || 
+                              (pet.bonus && pet.bonus.toLowerCase().includes(searchQuery));
+        
+        const matchesBonusCard = selectedBonusFilter 
+          ? (pet.bonus && pet.bonus.toLowerCase().includes(selectedBonusFilter.toLowerCase()))
+          : true;
+
+        const matchesFilter = 
+          currentFilter === 'all' ? true :
+          currentFilter === 'owned' ? pet.owned : !pet.owned;
+
+        return matchesSearch && matchesBonusCard && matchesFilter;
+      });
+
+      filteredPets.forEach(pet => {
+        const card = document.createElement('div');
+        card.className = `pet-card ${pet.owned ? 'owned' : ''}`;
+        
+        const imgSrc = pet.icon ? pet.icon : LOGO_FALLBACK;
+
+        card.innerHTML = `
+          <div class="pet-icon">
+            <img src="${imgSrc}" alt="${pet.name}" onerror="this.onerror=null; this.src='${LOGO_FALLBACK}';">
+          </div>
+          <div class="pet-title">
+            ${pet.miniIcon ? `<img src="${pet.miniIcon}" class="pet-mini-icon" alt="" onerror="this.style.display='none';">` : ''}
+            <span>${pet.name}</span>
+          </div>
+          <div class="bonus-container">
+            ${formatBonus(pet.bonus)}
+          </div>
+          <div class="card-actions">
+            <button class="pet-toggle-btn" onclick="togglePet(${pet.id})">
+              ${pet.owned ? '✓ Megvan' : '+ Beszerzés'}
+            </button>
+            ${pet.wikiUrl ? `<a href="${pet.wikiUrl}" target="_blank" rel="noopener noreferrer" class="wiki-btn">Eredeti Wiki</a>` : ''}
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      const totalCount = pets.length;
+      const percentage = totalCount > 0 ? Math.round((ownedCount / totalCount) * 100) : 0;
+      
+      document.getElementById('progress-text').innerText = `${ownedCount} / ${totalCount} (${percentage}%)`;
+      document.getElementById('progress-bar').style.width = `${percentage}%`;
+    }
+
+    function togglePet(id) {
+      pets = pets.map(pet => pet.id === id ? { ...pet, owned: !pet.owned } : pet);
+      saveToLocalStorage();
+      renderBonusQuickCards();
+      renderPets();
+    }
+
+    function setFilter(filter, button) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      renderPets();
+    }
+
+    init();
+  </script>
+</body>
+</html>
